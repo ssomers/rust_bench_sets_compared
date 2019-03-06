@@ -1,0 +1,4 @@
+[package]
+name = "rust_bench_sets_compared"
+version = "0.1.0"
+authors = ["Stein Somers <git@steinsomers.be>"]
