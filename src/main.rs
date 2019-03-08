@@ -6,7 +6,7 @@ pub fn to_seconds(duration: Duration) -> Seconds {
 }
 
 macro_rules! race_set {
-    ($name: ident, $type: ident) => {
+    ($name: ident, $type: ident, $next: ident) => {
         fn $name(n: u32) {
             use std::collections::$type;
 
@@ -17,7 +17,7 @@ macro_rules! race_set {
 
             // measure
             let sys_time = SystemTime::now();
-            while let Some(elt) = s.iter().next().cloned() {
+            while let Some(elt) = s.iter().$next().cloned() {
                 s.remove(&elt);
                 total += elt as usize;
             }
@@ -30,13 +30,20 @@ macro_rules! race_set {
             };
             assert_eq!(s.len(), 0);
             assert_eq!(total, n as usize * (n - 1) as usize / 2);
-            println!("Shrinking {:8} size={:4}k: {:.3}s", stringify!($type), n / 1000, secs);
+            println!(
+                "Shrinking {:8} size={:4}k: {:.3}s with {}",
+                stringify!($type),
+                n / 1000,
+                secs,
+                stringify!($next),
+            );
         }
     };
 }
 
-race_set!(pop_hashset, HashSet);
-race_set!(pop_btreeset, BTreeSet);
+race_set!(pop_hashset, HashSet, next);
+race_set!(pop_btreeset, BTreeSet, next);
+race_set!(pop_back_btreeset, BTreeSet, next_back);
 
 fn main() {
     debug_assert!(false, "Run with --release for meaningful measurements");
@@ -45,5 +52,10 @@ fn main() {
     pop_btreeset(2_000_000);
     pop_btreeset(3_000_000);
     pop_btreeset(4_000_000);
+    pop_back_btreeset(100_000);
+    pop_back_btreeset(1_000_000);
+    pop_back_btreeset(2_000_000);
+    pop_back_btreeset(3_000_000);
+    pop_back_btreeset(4_000_000);
     pop_hashset(100_000);
 }
