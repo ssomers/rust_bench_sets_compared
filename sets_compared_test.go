@@ -5,18 +5,16 @@ import (
 	"testing"
 )
 
-type Set map[int]struct{}
-
-func PickArbitrary(set *Set) int {
+func PickArbitrary(set *Set) Key {
 	for v, _ := range *set {
 		return v
 	}
 	panic("attempt to pick from empty set")
 }
 
-func BenchPeek(b *testing.B, size int) {
+func BenchPeek(b *testing.B, size Key) {
 	set := make(Set)
-	for i := 0; i < size; i++ {
+	for i := Key(0); i < size; i++ {
 		set[i] = struct{}{}
 	}
 

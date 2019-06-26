@@ -2,7 +2,7 @@
 pub struct SampleStatistics {
     max: f64,
     min: f64,
-    samples: isize,
+    samples: u32,
     sum: f64,
     sum_of_squares: f64,
 }
@@ -10,7 +10,7 @@ pub struct SampleStatistics {
 impl SampleStatistics {
     pub fn put(&mut self, v: f64) {
         if self.samples == 0 {
-            self.min = v.clone();
+            self.min.clone_from(&v);
             self.max = v;
         } else if self.min > v {
             self.min = v;
@@ -29,19 +29,23 @@ impl SampleStatistics {
         self.min.clone()
     }
     pub fn mean(&self) -> f64 {
-        if self.samples > 0 {
-            self.sum / self.samples as f64
-        } else {
+        if self.samples < 1 {
             std::f64::NAN
+        } else if self.min == self.max {
+            self.min
+        } else {
+            self.sum / f64::from(self.samples)
         }
     }
     pub fn variance(&self) -> f64 {
-        if self.samples > 1 {
-            let n = self.samples as f64;
-            let m = self.sum / n;
-            (self.sum_of_squares - 2.0 * m * self.sum + m.powi(2) * n) / (n - 1.0)
-        } else {
+        if self.samples < 2 {
             std::f64::NAN
+        } else if self.min == self.max {
+            0.
+        } else {
+            let n = f64::from(self.samples);
+            // may become slightly negative because of rounding:
+            (self.sum_of_squares - self.sum.powi(2) / n).max(0.) / (n - 1.)
         }
     }
     pub fn deviation(&self) -> f64 {
@@ -51,6 +55,8 @@ impl SampleStatistics {
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::float_cmp)]
+
     use super::*;
 
     #[test]
@@ -106,5 +112,45 @@ mod tests {
         assert_eq!(s.mean(), 5.0);
         assert_eq!(s.variance(), 4.0);
         assert_eq!(s.deviation(), 2.0);
+    }
+}
+
+#[cfg(test)]
+mod proptests {
+    extern crate proptest;
+    use self::proptest::prelude::*;
+    use super::*;
+
+    proptest! {
+        #[test]
+        fn put_1(x in proptest::num::f64::NORMAL) {
+            let mut s: SampleStatistics = Default::default();
+            s.put(x);
+            assert!(s.mean() >= s.min());
+            assert!(s.mean() <= s.max());
+        }
+
+        #[test]
+        fn put_2(x in proptest::num::f64::NORMAL, y in proptest::num::f64::NORMAL) {
+            let mut s: SampleStatistics = Default::default();
+            s.put(x);
+            s.put(y);
+            assert!(s.mean() >= s.min());
+            assert!(s.mean() <= s.max());
+            assert!(s.variance() >= 0.);
+            assert!(s.deviation() <= (s.max() - s.min()) * 1.5);
+        }
+
+        #[test]
+        fn put_n(i in 2..99, x in proptest::num::f64::NORMAL) {
+            let mut s: SampleStatistics = Default::default();
+            for _ in 0..i {
+                s.put(x);
+            }
+            assert!(s.mean() >= s.min());
+            assert!(s.mean() <= s.max());
+            assert!(s.variance() >= 0.);
+            assert!(s.deviation() <= (s.max() - s.min()));
+        }
     }
 }
