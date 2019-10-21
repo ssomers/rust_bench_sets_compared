@@ -99,7 +99,7 @@ fn main() {
     for i in (1..=5).rev() {
         print!("{}", i);
         stdout().flush().expect("Unable to flush stdout");
-        for n in (20_000..=100_000).step_by(20_000) {
+        for n in (20_000..200_000).step_by(20_000) {
             bench_btree_remove_next(&mut stats, n);
             bench_btree_take_next(&mut stats, n);
             bench_btree_take_next_back(&mut stats, n);

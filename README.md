@@ -20,4 +20,4 @@ Comparison of some of the performance of BTreeSet and HashSet and the standard s
       go run sets_compared.go
 
   Conclusion is that Go beats Rust's HashSet, but Rust's BTreeSet outshines both.
-[![Time spent popping all elements](https://plot.ly/~stein.somers/288.png?share_key=L1Ip7GHTXN5mkrNimTdFVe "View interactively")](https://plot.ly/~stein.somers/288/?share_key=L1Ip7GHTXN5mkrNimTdFVe)
+[![Time spent popping all elements](https://plot.ly/~stein.somers/290.png?share_key=b7J3hVET9wszKlyaW9OFMQ)](https://plot.ly/~stein.somers/290/?share_key=b7J3hVET9wszKlyaW9OFMQ)

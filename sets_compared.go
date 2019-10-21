@@ -88,7 +88,7 @@ func main() {
 				dev := stats.Deviation() / mean
 				fmt.Printf("%9d %.3f ±%.0f%%\n", N, mean, dev*100.0)
 			}
-			if N < 100e3 {
+			if N < 200e3 {
 				N += 20e3
 			} else {
 				N += 100e3
