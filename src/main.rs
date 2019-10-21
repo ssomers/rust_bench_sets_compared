@@ -37,7 +37,19 @@ fn hash_remove_next(s: &mut HashSet<i32>) -> Option<i32> {
     Some(elt)
 }
 
-type Stats = BTreeMap<(i32, &'static str), SampleStatistics>;
+fn hash_retain(s: &mut HashSet<i32>) -> Option<i32> {
+    let mut snatched: Option<i32> = None;
+    s.retain(|elt| match snatched {
+        None => {
+            snatched = Some(elt.clone());
+            false
+        }
+        Some(_) => true,
+    });
+    snatched
+}
+
+type Stats = BTreeMap<(&'static str, i32), SampleStatistics>;
 
 macro_rules! bench_set {
     ($name: ident, $pop: ident, $type: ident) => {
@@ -60,7 +72,7 @@ macro_rules! bench_set {
             };
             assert_eq!(s.len(), 0);
             assert_eq!(total, n as usize * (n - 1) as usize / 2);
-            let key = (n, stringify!($name));
+            let key = (stringify!($name), n);
             stats.entry(key).or_insert(Default::default()).put(secs);
             /*
             println!(
@@ -79,6 +91,7 @@ bench_set!(bench_btree_remove_next, btree_remove_next, BTreeSet);
 bench_set!(bench_btree_take_next, btree_take_next, BTreeSet);
 bench_set!(bench_hash_remove_next, hash_remove_next, HashSet);
 bench_set!(bench_hash_take_next, hash_take_next, HashSet);
+bench_set!(bench_hash_retain, hash_retain, HashSet);
 
 fn main() {
     debug_assert!(false, "Run with --release for meaningful measurements");
@@ -92,6 +105,14 @@ fn main() {
             bench_btree_take_next_back(&mut stats, n);
             bench_hash_remove_next(&mut stats, n);
             bench_hash_take_next(&mut stats, n);
+            if n <= 50_000 {
+                bench_hash_retain(&mut stats, n);
+            }
+        }
+        for n in (200_000..1_000_000).step_by(100_000) {
+            bench_btree_remove_next(&mut stats, n);
+            bench_btree_take_next(&mut stats, n);
+            bench_btree_take_next_back(&mut stats, n);
         }
         for n in (1_000_000..=5_000_000).step_by(1_000_000) {
             bench_btree_remove_next(&mut stats, n);
@@ -100,18 +121,15 @@ fn main() {
         }
     }
     println!(" done!");
-    let mut prev_n = 0;
-    for ((n, name), stat) in stats {
-        if prev_n != n {
-            prev_n = n;
-            if n < 1_000_000 {
-                println!("Size {}k", n / 1_000);
-            } else {
-                println!("Size {}M", n / 1_000_000);
-            };
+    let mut prev_name = "";
+    for ((name, n), stat) in stats {
+        if prev_name != name {
+            prev_name = name;
+            println!("{}", name);
+            println!("  {:>9} seconds", "size");
         }
         let mean = stat.mean();
         let dev = stat.deviation() / mean;
-        println!("  {:26}: {:.3}s ±{:3.0}%", name, mean, dev * 100.0);
+        println!("  {:>9} {:.3} ±{:3.0}%", n, mean, dev * 100.0);
     }
 }
