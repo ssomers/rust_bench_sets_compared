@@ -23,12 +23,13 @@ impl SampleStatistics {
     }
 
     pub fn max(&self) -> f64 {
-        self.max.clone()
+        self.max
     }
     pub fn min(&self) -> f64 {
-        self.min.clone()
+        self.min
     }
     pub fn mean(&self) -> f64 {
+        #![allow(clippy::float_cmp)]
         if self.samples < 1 {
             std::f64::NAN
         } else if self.min == self.max {
@@ -38,6 +39,7 @@ impl SampleStatistics {
         }
     }
     pub fn variance(&self) -> f64 {
+        #![allow(clippy::float_cmp)]
         if self.samples < 2 {
             std::f64::NAN
         } else if self.min == self.max {

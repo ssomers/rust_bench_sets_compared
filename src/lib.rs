@@ -2,10 +2,14 @@
 extern crate fnv;
 extern crate hashbrown;
 extern crate test;
-#[cfg(test)] use std::collections::BTreeSet;
-#[cfg(test)] use std::collections::HashSet;
-#[cfg(test)] use fnv::FnvHashSet;
-#[cfg(test)] use hashbrown::HashSet as HashbrownSet;
+#[cfg(test)]
+use fnv::FnvHashSet;
+#[cfg(test)]
+use hashbrown::HashSet as HashbrownSet;
+#[cfg(test)]
+use std::collections::BTreeSet;
+#[cfg(test)]
+use std::collections::HashSet;
 
 macro_rules! bench_set {
     ($name: ident, $type: ident, $size: expr) => {

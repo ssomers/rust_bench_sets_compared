@@ -8,4 +8,4 @@ proptest = "0.9"
 
 [dependencies]
 fnv = "1.0.6"
-hashbrown = "0.5"
+hashbrown = "0.6"
