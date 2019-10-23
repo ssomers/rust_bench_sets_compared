@@ -8,7 +8,42 @@ Comparison of some of the performance of BTreeSet and HashSet and the standard s
       cargo bench
       go test -bench=.
 
-  Conclusion is that peek is pretty fast in Rust's standard library (compared to Go) but it's relatively bad in BTreeSet compared to hash sets.
+  Conclusion (for 32 bit elements on 64 bit architecture) is that peek is pretty fast in Rust's standard library (compared to Go) but it's relatively bad in BTreeSet compared to hash sets.
+
+  Rust `BTreeSet`:
+
+      test peek_btreeset_1         ... bench:           8 ns/iter (+/- 0)
+      test peek_btreeset_100       ... bench:          10 ns/iter (+/- 0)
+      test peek_btreeset_10k       ... bench:          11 ns/iter (+/- 0)
+      test peek_btreeset_1kk       ... bench:          12 ns/iter (+/- 0)
+
+  Rust `HashSet`:
+  
+      test peek_hashset_1          ... bench:           1 ns/iter (+/- 0)
+      test peek_hashset_100        ... bench:           1 ns/iter (+/- 0)
+      test peek_hashset_10k        ... bench:           1 ns/iter (+/- 0)
+      test peek_hashset_1kk        ... bench:           1 ns/iter (+/- 0)
+
+  Rust `fnv::FnvHashSet`:
+  
+      test peek_fnvhashtreeset_1   ... bench:           1 ns/iter (+/- 0)
+      test peek_fnvhashtreeset_100 ... bench:           1 ns/iter (+/- 0)
+      test peek_fnvhashtreeset_10k ... bench:           1 ns/iter (+/- 0)
+      test peek_fnvhashtreeset_1kk ... bench:           1 ns/iter (+/- 0)
+      
+  Rust `hashbrown::HashSet`:
+      
+      test peek_hashbrownset_1     ... bench:           1 ns/iter (+/- 0)
+      test peek_hashbrownset_100   ... bench:           1 ns/iter (+/- 0)
+      test peek_hashbrownset_10k   ... bench:           1 ns/iter (+/- 0)
+      test peek_hashbrownset_1kk   ... bench:           1 ns/iter (+/- 0)
+
+  Go `map[uint32]struct{}`:
+
+      BenchmarkPeek1-6        42987794                28.4 ns/op
+      BenchmarkPeek100-6      50083262                23.0 ns/op
+      BenchmarkPeek10k-6      44564107                27.7 ns/op
+      BenchmarkPeek1kk-6      19406798                62.1 ns/op
 
 - Benchmark program for draining a set with "pop", a method to split off an arbitrary element from a set.
 
