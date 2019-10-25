@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type Key uint32
+type Key int32
 type Set map[Key]struct{}
 
 type SampleStatistics struct {
