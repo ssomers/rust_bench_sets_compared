@@ -41,7 +41,7 @@ fn hash_retain(s: &mut HashSet<i32>) -> Option<i32> {
     let mut snatched: Option<i32> = None;
     s.retain(|elt| match snatched {
         None => {
-            snatched = Some(elt.clone());
+            snatched = Some(*elt);
             false
         }
         Some(_) => true,
