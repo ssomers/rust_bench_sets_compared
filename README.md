@@ -49,7 +49,11 @@ Comparison of some of the performance of BTreeSet and HashSet and the standard s
 
   This is very different from the standard drain method because the (shrinking) set remains valid and usable after each pop. You can even remove more elements, or add others, in each step. It helps in some relatively simple algorithms (e.g. the basic form, without vertex ordering, of [the Bron-Kerbosch algorithm](https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm)).
   
-  Since this "pop" does not prescribe any particular order (like "smallest" element first), its implementation can choose an element that can be removed efficiently, in the current state of the data structure chosen to represent the set. That speeds up all simple algorithms using "pop", though it's probably better to let them visit elements in a random or a smart order (like the non-basic forms of Bron-Kerbosch do). To compare times:
+  Since this "pop" does not prescribe any particular order (like "smallest" element first), its implementation can choose an element that can be removed efficiently, in the current state of the data structure chosen to represent the set. That speeds up all simple algorithms using "pop", but it's easy to unknowingly rely on the arbitrary choice, it's harder to debug, and if the goal is best performance, it's probably better to let algorithms visit elements in a random or a smart order (like the non-basic forms of Bron-Kerbosch do).
+  
+  For an ordered set like BTreeSet, we can simply use a "pop_first" that has a deterministic outcome and should also work efficiently, [if it were stabilized](https://github.com/rust-lang/rust/pull/65637).
+  
+  To compare times:
  
       cargo run --release
       go run sets_compared.go
