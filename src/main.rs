@@ -1,3 +1,5 @@
+#![feature(map_first_last)]
+
 pub mod stats;
 use stats::SampleStatistics;
 
@@ -24,6 +26,19 @@ fn btree_take_next(s: &mut BTreeSet<i32>) -> Option<i32> {
 fn btree_take_next_back(s: &mut BTreeSet<i32>) -> Option<i32> {
     let elt = s.iter().next_back().copied()?;
     s.take(&elt)
+}
+
+fn btree_take_first(s: &mut BTreeSet<i32>) -> Option<i32> {
+    let elt = s.first().copied();
+    elt.and_then(|e| s.take(&e))
+}
+
+fn btree_pop_first(s: &mut BTreeSet<i32>) -> Option<i32> {
+    s.pop_first()
+}
+
+fn btree_pop_last(s: &mut BTreeSet<i32>) -> Option<i32> {
+    s.pop_last()
 }
 
 fn hash_take_next(s: &mut HashSet<i32>) -> Option<i32> {
@@ -86,9 +101,12 @@ macro_rules! bench_set {
     };
 }
 
-bench_set!(bench_btree_take_next_back, btree_take_next_back, BTreeSet);
 bench_set!(bench_btree_remove_next, btree_remove_next, BTreeSet);
 bench_set!(bench_btree_take_next, btree_take_next, BTreeSet);
+bench_set!(bench_btree_take_next_back, btree_take_next_back, BTreeSet);
+bench_set!(bench_btree_take_first, btree_take_first, BTreeSet);
+bench_set!(bench_btree_pop_first, btree_pop_first, BTreeSet);
+bench_set!(bench_btree_pop_last, btree_pop_last, BTreeSet);
 bench_set!(bench_hash_remove_next, hash_remove_next, HashSet);
 bench_set!(bench_hash_take_next, hash_take_next, HashSet);
 bench_set!(bench_hash_retain, hash_retain, HashSet);
@@ -103,6 +121,9 @@ fn main() {
             bench_btree_remove_next(&mut stats, n);
             bench_btree_take_next(&mut stats, n);
             bench_btree_take_next_back(&mut stats, n);
+            bench_btree_take_first(&mut stats, n);
+            bench_btree_pop_first(&mut stats, n);
+            bench_btree_pop_last(&mut stats, n);
             bench_hash_remove_next(&mut stats, n);
             bench_hash_take_next(&mut stats, n);
             if n <= 50_000 {
@@ -113,11 +134,17 @@ fn main() {
             bench_btree_remove_next(&mut stats, n);
             bench_btree_take_next(&mut stats, n);
             bench_btree_take_next_back(&mut stats, n);
+            bench_btree_take_first(&mut stats, n);
+            bench_btree_pop_first(&mut stats, n);
+            bench_btree_pop_last(&mut stats, n);
         }
         for n in (1_000_000..=5_000_000).step_by(1_000_000) {
             bench_btree_remove_next(&mut stats, n);
             bench_btree_take_next(&mut stats, n);
             bench_btree_take_next_back(&mut stats, n);
+            bench_btree_take_first(&mut stats, n);
+            bench_btree_pop_first(&mut stats, n);
+            bench_btree_pop_last(&mut stats, n);
         }
     }
     println!(" done!");
